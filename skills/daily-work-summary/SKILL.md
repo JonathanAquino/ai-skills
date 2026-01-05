@@ -17,7 +17,7 @@ The only commands you are allowed to run are read-only commands and file write c
 
 ## Slack
 
-Ask me for a sample search.modules.messages curl request to get slack search results for "from:@Jon Aquino" for yesterday.
+Ask me for a sample search.modules.messages curl request to get slack search results for "from:@Jon Aquino" for yesterday, sorted by Newest.
 
 Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, run `say "curl command failed"` and stop.
 
