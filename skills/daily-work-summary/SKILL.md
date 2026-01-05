@@ -99,3 +99,31 @@ Run `say "daily work script finished"`.
 3. **Rate limiting**: Add `sleep 1` between requests. If you hit rate limits, sleep for 30 seconds and retry.
 
 4. **Empty files for no PRs**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no PRs, so they get skipped on subsequent runs.
+
+### Summary Generation
+
+1. **File naming convention**:
+   - Days with activity: `2025-10-15-deadlock-oom-fixes.md` (date + 3-4 word description of main activity)
+   - Days with no activity: `2025-10-18.md` (just the date, empty file)
+
+2. **Summary structure**: Use this format for Daily Summaries:
+   ```markdown
+   # Daily Work Summary: YYYY-MM-DD
+
+   ## Main Activities
+   [Describe main work items with PR numbers and JIRA tickets]
+
+   ## Slack Discussions
+   [Key discussions and coordination]
+
+   ## PRs Merged
+   1. repo#number - Title
+   ```
+
+3. **Paragraph summary format**: 1-2 sentences capturing the essence of the day's work, mentioning PR numbers and ticket IDs where relevant.
+
+4. **Empty days**: For weekends or days with no work activity, use `touch` to create empty files so they get skipped on subsequent runs.
+
+5. **Batch processing**: Check multiple days at once (5-10 days) to speed up processing, then create summaries for each.
+
+6. **Slack-only days**: If there are Slack discussions but no PRs, still create a summary focusing on the discussions, coordination, and any investigations mentioned.
