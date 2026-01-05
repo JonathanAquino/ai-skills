@@ -21,7 +21,7 @@ Ask me for a sample search.modules.messages curl request to get slack search res
 
 Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, run `say "curl command failed"` and stop.
 
-I want you to scrape the search results for each day in the date range and put the results in `~/Dropbox/ai-context/slack/YYYY-MM-DD.txt`. For example, `~/Dropbox/ai-context/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
+I want you to scrape the search results for each day in the date range and put the results in `~/Dropbox/ai-context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Dropbox/ai-context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
 
 ```
 --------------------------------------------------
@@ -34,7 +34,7 @@ Text: I need reviews on my funnel metrics PRs
 
 ## GitHub
 
-Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Dropbox/ai-context/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
 ## Summary
 
@@ -42,8 +42,8 @@ For each day in the date range, I would like a summary of my work on that day. P
 
 Use the following as source material:
 
-* `~/Dropbox/ai-context/github/2025-07-21.txt`
-* `~/Dropbox/ai-context/slack/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
 * `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
@@ -55,8 +55,8 @@ For each day in the date range, I would like a 1-paragraph summary of my work on
 
 Use the following as source material:
 
-* `~/Dropbox/ai-context/github/2025-07-21.txt`
-* `~/Dropbox/ai-context/slack/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
 * `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
