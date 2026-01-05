@@ -65,3 +65,37 @@ Don't forget the conversations with AI coding tools.
 ## Finish
 
 Run `say "daily work script finished"`.
+
+## Implementation Notes
+
+### Slack Scraping
+
+1. **Use a shell script file**: Write the curl command to a temp file like `/tmp/slack_search.sh` and execute it from there. This avoids shell escaping issues with the complex cookie strings and multipart form data.
+
+2. **Use `-H 'cookie: ...'` instead of `-b '...'`**: The `-b` option has parsing issues with complex cookie strings that contain special characters.
+
+3. **Correct jq structure**: The API returns nested data - messages are inside `.items[].messages[]`. Use this jq command:
+   ```
+   jq -r '.items[] | .channel.name as $chan | .messages[0] | "--------------------------------------------------\n\nTimestamp: \(if .ts then (.ts | tonumber | strftime("%Y-%m-%d %H:%M:%S")) else "unknown" end)\nUser: \(.username // "unknown")\nChannel: \($chan // "unknown")\nText: \(.text // "")"'
+   ```
+
+4. **Rate limiting**: Add `sleep 0.5` between requests to avoid rate limiting.
+
+5. **Multipart form data**: The `--data-raw` content needs proper line endings. In the shell script, use actual newlines instead of `\r\n` escape sequences.
+
+### GitHub PR Scraping
+
+1. **Use a shell script file**: Similar to Slack, write the fetch logic to a temp file like `/tmp/fetch_prs.sh` to avoid escaping issues.
+
+2. **Validate JSON response**: Check if the result starts with `[` to verify it's a valid JSON array:
+   ```bash
+   FIRST_CHAR=$(echo "$RESULT" | head -c 1)
+   if [[ "$FIRST_CHAR" != "[" ]]; then
+       echo "Error - not valid JSON"
+       exit 1
+   fi
+   ```
+
+3. **Rate limiting**: Add `sleep 1` between requests. If you hit rate limits, sleep for 30 seconds and retry.
+
+4. **Empty files for no PRs**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no PRs, so they get skipped on subsequent runs.
