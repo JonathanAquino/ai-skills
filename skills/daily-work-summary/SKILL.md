@@ -19,7 +19,7 @@ The only commands you are allowed to run are read-only commands and file write c
 
 Ask me for a sample search.modules.messages curl request to get slack search results for "from:@Jon Aquino" for yesterday, sorted by Newest.
 
-Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, run `say "curl command failed"` and stop.
+Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, print "curl command failed" and stop.
 
 I want you to scrape the search results for each day in the date range and put the results in `~/Dropbox/ai-context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Dropbox/ai-context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
 
@@ -64,7 +64,7 @@ Don't forget the conversations with AI coding tools.
 
 ## Finish
 
-Run `say "daily work script finished"`.
+Print "daily work script finished".
 
 ## Implementation Notes
 
