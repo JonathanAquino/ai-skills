@@ -46,7 +46,7 @@ Use this curl command pattern:
 
 ```bash
 curl -s -u "$EMAIL:$API_TOKEN" -X GET \
-  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments" \
+  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
   -H "Accept: application/json"
 ```
 
@@ -160,19 +160,32 @@ Remind me to delete the Jira API token from https://id.atlassian.com/manage-prof
 
 3. **Expand comments**: Always include `expand=comments` in the query parameters to get all comments inline with the issues.
 
-4. **Parse JSON response**: Use jq to format the output. Example command structure:
-   ```bash
-   curl -s -u "$EMAIL:$API_TOKEN" \
-     "https://adroll.atlassian.net/rest/api/3/search?jql=..." \
-     -H "Accept: application/json" | \
-   jq -r '.issues[] | "--------------------------------------------------\n\nTicket: \(.key)\nSummary: \(.fields.summary)\nStatus: \(.fields.status.name)\nCreated: \(.fields.created)\nUpdated: \(.fields.updated)\nURL: https://adroll.atlassian.net/browse/\(.key)\n\nDescription:\n\(.fields.description.content[0].content[0].text // "No description")\n\nComments:\n\(.fields.comment.comments[] | "- \(.created) (\(.author.displayName)): \(.body.content[0].content[0].text // "")")"'
+4. **Custom description field**: UDP tickets use `customfield_13337` ("Ticket Description") instead of the standard `description` field. Always include both `description` and `customfield_13337` in the fields parameter, and check both when extracting text.
+
+5. **Atlassian Document Format (ADF)**: Descriptions and comments use nested JSON structures. Extract text recursively by walking through `content` arrays and collecting `text` nodes. Handle `hardBreak` nodes as newlines.
+
+6. **Parse JSON response**: Use jq with a recursive text extraction function. Check both `description` and `customfield_13337` for the ticket description (preferring the custom field if present):
+   ```jq
+   def extract_text:
+     if type == "object" then
+       if .type == "text" then .text
+       elif .type == "hardBreak" then "\n"
+       elif .content then .content | map(extract_text) | join("")
+       else "" end
+     elif type == "array" then map(extract_text) | join("\n\n")
+     else "" end;
+
+   .issues[] |
+   "Ticket: \(.key)\nDescription:\n\(
+     if .fields.customfield_13337 then (.fields.customfield_13337 | extract_text)
+     elif .fields.description then (.fields.description | extract_text)
+     else "No description" end
+   )\nComments:\n\([.fields.comment.comments[] | "- \(.author.displayName): \(.body | extract_text)"] | join("\n\n"))"
    ```
 
-5. **Rate limiting**: Add `sleep 0.5` between requests to avoid rate limiting.
+7. **Rate limiting**: Add `sleep 0.5` between requests to avoid rate limiting.
 
-6. **Empty files for no tickets**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no Jira activity, so they get skipped on subsequent runs.
-
-7. **Date formatting**: Jira returns ISO 8601 timestamps. You may want to use jq's date functions to format them more readably: `(.created | sub("\\.[0-9]+"; "") | strptime("%Y-%m-%dT%H:%M:%S%z") | strftime("%Y-%m-%d %H:%M:%S"))`.
+8. **Empty files for no tickets**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no Jira activity, so they get skipped on subsequent runs.
 
 ### Claude Code Conversation Extraction
 
