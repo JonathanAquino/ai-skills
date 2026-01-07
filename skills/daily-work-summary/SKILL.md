@@ -72,6 +72,18 @@ Comments:
 
 Use jq to parse the JSON response and extract: key, summary, status, created, updated, description, and all comments with timestamps and authors. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Add `sleep 0.5` between requests to avoid rate limiting.
 
+## Claude Code Conversations
+
+Extract my messages from Claude Code conversation logs for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`. Skip any dates whose files already exist. If there were no conversations on the day, create an empty file `2025-07-21.txt`.
+
+Use this command to extract user messages for a specific date:
+
+```bash
+find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("2025-07-21")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null > ~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt
+```
+
+This extracts only your typed messages, excluding Claude's responses, tool results, and system-generated messages. Each message will appear on its own line in the output file.
+
 ## Summary
 
 For each day in the date range, I would like a summary of my work on that day. Put the results in `~/Dropbox/Jon's Obsidian Vault/Work/Daily Summaries`, for example, `~/Dropbox/Jon's Obsidian Vault/Work/Daily Summaries/2025-07-21-uhura-staging-recovery.md`. Note that it is the date followed by a 3 or 4 word short description. If there is no material for the day, call it `2025-07-21.md` and make it an empty file. Skip any dates whose files already exist.
@@ -81,10 +93,10 @@ Use the following as source material:
 * `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
+* `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
-Don't forget the conversations with AI coding tools and Jira tickets.
+Don't forget the Claude Code conversations and Jira tickets.
 
 ## Paragraph Summary
 
@@ -95,10 +107,10 @@ Use the following as source material:
 * `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
+* `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
-Don't forget the conversations with AI coding tools and Jira tickets.
+Don't forget the Claude Code conversations and Jira tickets.
 
 ## Finish
 
@@ -160,22 +172,23 @@ Print "daily work script finished".
 
 7. **Date formatting**: Jira returns ISO 8601 timestamps. You may want to use jq's date functions to format them more readably: `(.created | sub("\\.[0-9]+"; "") | strptime("%Y-%m-%dT%H:%M:%S%z") | strftime("%Y-%m-%d %H:%M:%S"))`.
 
-### AI Conversation Extraction
+### Claude Code Conversation Extraction
 
-To extract the user's messages from Claude Code conversation logs for a specific date:
+1. **Session files only**: Use pattern `[0-9a-f]*.jsonl` to match UUID-named session files (main conversations), excluding `agent-*.jsonl` files (background agent operations with ~437 files)
 
-```bash
-find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("YYYY-MM-DD")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null
-```
+2. **Message filtering chain**: The jq filters are applied in sequence:
+   - `select(.timestamp? | contains("YYYY-MM-DD"))` - Filter by date
+   - `select(.type == "user")` - Only user messages, not Claude's responses
+   - `select(.message.content | type == "string")` - Only text content, excludes tool results (arrays)
+   - `select(.message.content | test("<command-name>|<local-command|Caveat:") | not)` - Excludes system messages
 
-**Key points**:
-1. **Session files only**: Uses pattern `[0-9a-f]*.jsonl` to match UUID-named session files (main conversations), excluding `agent-*.jsonl` files (background agent operations)
-2. **User messages only**: Filters for `type == "user"` to exclude Claude's responses
-3. **Text content only**: Filters for string content to exclude tool results (which are arrays)
-4. **No system messages**: Filters out internal system messages like command metadata using regex pattern matching
-5. **File types**:
+3. **File structure**:
    - Session files (e.g., `b8b3da6b-441b-4c7e-a787-64a1614253e4.jsonl`): Main conversation with `isSidechain: false`
    - Agent files (e.g., `agent-a3b64fe.jsonl`): Background agent work with `isSidechain: true`
+
+4. **Output format**: Each message appears on its own line. Messages are already in chronological order from the JSONL files.
+
+5. **Empty files**: If no conversations exist for a date, the output redirection will create an empty file, which is correct behavior for consistency with other data sources.
 
 ### Summary Generation
 
