@@ -40,13 +40,13 @@ Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-
 
 Ask me for my Jira API token and email. Tell me to generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens if I don't have one. Store them temporarily for use in API calls during this session only.
 
-Use the Jira REST API to fetch tickets I worked on for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`. Skip any dates whose files already exist. If there were no tickets on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+Use the Jira REST API to fetch tickets I resolved for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`. Skip any dates whose files already exist. If there were no tickets on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
 Use this curl command pattern:
 
 ```bash
 curl -s -u "$EMAIL:$API_TOKEN" -X GET \
-  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20updated%20%3E%3D%20%222025-07-21%22%20AND%20updated%20%3C%20%222025-07-22%22&maxResults=100&expand=comments" \
+  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments" \
   -H "Accept: application/json"
 ```
 
@@ -156,7 +156,7 @@ Remind me to delete the Jira API token from https://id.atlassian.com/manage-prof
 
 1. **API Authentication**: Use basic auth with email and API token: `-u "$EMAIL:$API_TOKEN"`. The user should generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens
 
-2. **JQL date filtering**: Use `updated >= "YYYY-MM-DD" AND updated < "YYYY-MM-DD"` to filter by date range. The `updated` field captures any activity on the ticket (comments, status changes, etc.).
+2. **JQL date filtering**: Use `statusCategory = Done AND resolved >= "YYYY-MM-DD" AND resolved <= "YYYY-MM-DD"` to filter by date range. The `statusCategory = Done` ensures only completed tickets are included, and `resolved` captures the completion date. Note: Use `<=` for the upper bound (inclusive) rather than `<` to capture the full day.
 
 3. **Expand comments**: Always include `expand=comments` in the query parameters to get all comments inline with the issues.
 
