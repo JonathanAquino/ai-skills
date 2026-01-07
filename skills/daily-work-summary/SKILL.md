@@ -38,7 +38,7 @@ Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-
 
 ## Jira
 
-Ask me for my Jira API token and email. Store them temporarily for use in API calls during this session only.
+Ask me for my Jira API token and email. Tell me to generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens if I don't have one. Store them temporarily for use in API calls during this session only.
 
 Use the Jira REST API to fetch tickets I worked on for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`. Skip any dates whose files already exist. If there were no tickets on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
@@ -115,6 +115,8 @@ Don't forget the Claude Code conversations and Jira tickets.
 ## Finish
 
 Print "daily work script finished".
+
+Remind me to delete the Jira API token from https://id.atlassian.com/manage-profile/security/api-tokens for security.
 
 ## Implementation Notes
 
