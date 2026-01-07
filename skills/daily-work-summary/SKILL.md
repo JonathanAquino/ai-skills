@@ -36,6 +36,42 @@ Text: I need reviews on my funnel metrics PRs
 
 Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
+## Jira
+
+Ask me for my Jira API token and email. Store them temporarily for use in API calls during this session only.
+
+Use the Jira REST API to fetch tickets I worked on for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`. Skip any dates whose files already exist. If there were no tickets on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+
+Use this curl command pattern:
+
+```bash
+curl -s -u "$EMAIL:$API_TOKEN" -X GET \
+  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20updated%20%3E%3D%20%222025-07-21%22%20AND%20updated%20%3C%20%222025-07-22%22&maxResults=100&expand=comments" \
+  -H "Accept: application/json"
+```
+
+Format each ticket entry like this:
+
+```
+--------------------------------------------------
+
+Ticket: ABC-1234
+Summary: Fix the database connection issue
+Status: Done
+Created: 2025-07-21 09:15:23
+Updated: 2025-07-21 14:30:45
+URL: https://adroll.atlassian.net/browse/ABC-1234
+
+Description:
+[ticket description text]
+
+Comments:
+- 2025-07-21 10:30:12 (jonathan.aquino): Started investigating the connection pool settings
+- 2025-07-21 14:28:03 (jane.doe): Looks good, approved for merge
+```
+
+Use jq to parse the JSON response and extract: key, summary, status, created, updated, description, and all comments with timestamps and authors. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Add `sleep 0.5` between requests to avoid rate limiting.
+
 ## Summary
 
 For each day in the date range, I would like a summary of my work on that day. Put the results in `~/Dropbox/Jon's Obsidian Vault/Work/Daily Summaries`, for example, `~/Dropbox/Jon's Obsidian Vault/Work/Daily Summaries/2025-07-21-uhura-staging-recovery.md`. Note that it is the date followed by a 3 or 4 word short description. If there is no material for the day, call it `2025-07-21.md` and make it an empty file. Skip any dates whose files already exist.
@@ -44,10 +80,11 @@ Use the following as source material:
 
 * `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
 * `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
-Don't forget the conversations with AI coding tools.
+Don't forget the conversations with AI coding tools and Jira tickets.
 
 ## Paragraph Summary
 
@@ -57,10 +94,11 @@ Use the following as source material:
 
 * `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
 * `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
+* `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
 * `~/.claude/projects` - use rg to find entries by YYYY-MM-DD (conversations with AI coding tools)
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
-Don't forget the conversations with AI coding tools.
+Don't forget the conversations with AI coding tools and Jira tickets.
 
 ## Finish
 
@@ -99,6 +137,28 @@ Print "daily work script finished".
 3. **Rate limiting**: Add `sleep 1` between requests. If you hit rate limits, sleep for 30 seconds and retry.
 
 4. **Empty files for no PRs**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no PRs, so they get skipped on subsequent runs.
+
+### Jira Scraping
+
+1. **API Authentication**: Use basic auth with email and API token: `-u "$EMAIL:$API_TOKEN"`. The user should generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens
+
+2. **JQL date filtering**: Use `updated >= "YYYY-MM-DD" AND updated < "YYYY-MM-DD"` to filter by date range. The `updated` field captures any activity on the ticket (comments, status changes, etc.).
+
+3. **Expand comments**: Always include `expand=comments` in the query parameters to get all comments inline with the issues.
+
+4. **Parse JSON response**: Use jq to format the output. Example command structure:
+   ```bash
+   curl -s -u "$EMAIL:$API_TOKEN" \
+     "https://adroll.atlassian.net/rest/api/3/search?jql=..." \
+     -H "Accept: application/json" | \
+   jq -r '.issues[] | "--------------------------------------------------\n\nTicket: \(.key)\nSummary: \(.fields.summary)\nStatus: \(.fields.status.name)\nCreated: \(.fields.created)\nUpdated: \(.fields.updated)\nURL: https://adroll.atlassian.net/browse/\(.key)\n\nDescription:\n\(.fields.description.content[0].content[0].text // "No description")\n\nComments:\n\(.fields.comment.comments[] | "- \(.created) (\(.author.displayName)): \(.body.content[0].content[0].text // "")")"'
+   ```
+
+5. **Rate limiting**: Add `sleep 0.5` between requests to avoid rate limiting.
+
+6. **Empty files for no tickets**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no Jira activity, so they get skipped on subsequent runs.
+
+7. **Date formatting**: Jira returns ISO 8601 timestamps. You may want to use jq's date functions to format them more readably: `(.created | sub("\\.[0-9]+"; "") | strptime("%Y-%m-%dT%H:%M:%S%z") | strftime("%Y-%m-%d %H:%M:%S"))`.
 
 ### AI Conversation Extraction
 
