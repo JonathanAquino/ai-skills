@@ -100,6 +100,23 @@ Print "daily work script finished".
 
 4. **Empty files for no PRs**: Use `touch "$OUTPUT_FILE"` to create empty files for days with no PRs, so they get skipped on subsequent runs.
 
+### AI Conversation Extraction
+
+To extract the user's messages from Claude Code conversation logs for a specific date:
+
+```bash
+find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("YYYY-MM-DD")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null
+```
+
+**Key points**:
+1. **Session files only**: Uses pattern `[0-9a-f]*.jsonl` to match UUID-named session files (main conversations), excluding `agent-*.jsonl` files (background agent operations)
+2. **User messages only**: Filters for `type == "user"` to exclude Claude's responses
+3. **Text content only**: Filters for string content to exclude tool results (which are arrays)
+4. **No system messages**: Filters out internal system messages like command metadata using regex pattern matching
+5. **File types**:
+   - Session files (e.g., `b8b3da6b-441b-4c7e-a787-64a1614253e4.jsonl`): Main conversation with `isSidechain: false`
+   - Agent files (e.g., `agent-a3b64fe.jsonl`): Background agent work with `isSidechain: true`
+
 ### Summary Generation
 
 1. **File naming convention**:
