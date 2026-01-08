@@ -40,7 +40,7 @@ Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-
 
 Ask me for my Jira API token and email. Tell me to generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens if I don't have one. Store them temporarily as environment variables for use during this session only.
 
-Use the `fetch-jira.sh` script in this directory to fetch tickets. The script accepts start and end dates and queries Jira for all resolved tickets in that range, then splits them into daily files.
+Use the `fetch-jira.sh` script in this directory to fetch tickets. The script accepts start and end dates (both inclusive) and queries Jira for all resolved tickets in that range, then splits them into daily files.
 
 To fetch data efficiently, query 1-2 months at a time:
 

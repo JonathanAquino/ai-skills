@@ -28,9 +28,13 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "Fetching Jira tickets from $START_DATE to $END_DATE..."
 
+# Calculate the day after END_DATE for proper range query
+# (resolved >= START AND resolved < END+1 captures the full END day)
+END_DATE_PLUS_ONE=$(date -d "$END_DATE + 1 day" +%Y-%m-%d)
+
 # Fetch tickets for the date range
 RESPONSE=$(curl -s -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" -X GET \
-  "https://adroll.atlassian.net/rest/api/3/search/jql?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%22${START_DATE}%22%20AND%20resolved%20%3C%3D%20%22${END_DATE}%22%20ORDER%20BY%20created%20DESC&maxResults=1000&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
+  "https://adroll.atlassian.net/rest/api/3/search/jql?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%22${START_DATE}%22%20AND%20resolved%20%3C%20%22${END_DATE_PLUS_ONE}%22%20ORDER%20BY%20created%20DESC&maxResults=1000&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
   -H "Accept: application/json")
 
 # Check for errors
@@ -65,9 +69,10 @@ def extract_text:
   if type == "object" then
     if .type == "text" then .text
     elif .type == "hardBreak" then "\n"
+    elif .type == "paragraph" then ((.content // []) | map(extract_text) | join("")) + "\n\n"
     elif .content then .content | map(extract_text) | join("")
     else "" end
-  elif type == "array" then map(extract_text) | join("\n\n")
+  elif type == "array" then map(extract_text) | join("")
   else "" end;
 
 .issues[] |
