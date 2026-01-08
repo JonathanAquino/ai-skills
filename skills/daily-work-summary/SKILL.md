@@ -222,3 +222,12 @@ Remind me to delete the Jira API token from https://id.atlassian.com/manage-prof
 5. **Batch processing**: Check multiple days at once (5-10 days) to speed up processing, then create summaries for each.
 
 6. **Slack-only days**: If there are Slack discussions but no PRs, still create a summary focusing on the discussions, coordination, and any investigations mentioned.
+
+### General Shell Scripting
+
+1. **Path handling with special characters**: When working with paths containing apostrophes (like `Jon's Obsidian Vault`):
+   - Use absolute paths: `/home/jon/Dropbox/Jon's Obsidian Vault/...` instead of `~/Dropbox/Jon's Obsidian Vault/...`
+   - Or use proper quoting: `"$HOME/Dropbox/Jon's Obsidian Vault/..."`
+   - Avoid mixing tilde expansion (`~`) with escaped quotes (`\'`), as the shell expands `~` before processing quotes/escapes
+   - Example that fails: `~/Dropbox/Jon\'s\ Obsidian\ Vault/`
+   - Example that works: `/home/jon/Dropbox/Jon\'s\ Obsidian\ Vault/`
