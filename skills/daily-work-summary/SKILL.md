@@ -46,7 +46,7 @@ Use this curl command pattern:
 
 ```bash
 curl -s -u "$EMAIL:$API_TOKEN" -X GET \
-  "https://adroll.atlassian.net/rest/api/3/search?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
+  "https://adroll.atlassian.net/rest/api/3/search/jql?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
   -H "Accept: application/json"
 ```
 
