@@ -1,6 +1,6 @@
 ---
 name: daily-work-summary
-description: Generate daily work summaries from Slack messages, GitHub PRs, AI conversations, and Obsidian notes for the past 45 days.
+description: Generate daily work summaries from Slack messages, GitHub PRs, AI conversations, and Obsidian notes for a specified date range.
 ---
 
 # Daily Work Summary Generator
