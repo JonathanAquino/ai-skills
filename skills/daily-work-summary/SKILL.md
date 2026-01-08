@@ -38,39 +38,29 @@ Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-
 
 ## Jira
 
-Ask me for my Jira API token and email. Tell me to generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens if I don't have one. Store them temporarily for use in API calls during this session only.
+Ask me for my Jira API token and email. Tell me to generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens if I don't have one. Store them temporarily as environment variables for use during this session only.
 
-Use the Jira REST API to fetch tickets I resolved for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`. Skip any dates whose files already exist. If there were no tickets on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+Use the `fetch-jira.sh` script in this directory to fetch tickets. The script accepts start and end dates and queries Jira for all resolved tickets in that range, then splits them into daily files.
 
-Use this curl command pattern:
+To fetch data efficiently, query 1-2 months at a time:
 
 ```bash
-curl -s -u "$EMAIL:$API_TOKEN" -X GET \
-  "https://adroll.atlassian.net/rest/api/3/search/jql?jql=assignee%20%3D%20currentUser()%20AND%20statusCategory%20%3D%20Done%20AND%20resolved%20%3E%3D%20%222025-07-21%22%20AND%20resolved%20%3C%3D%20%222025-07-21%22%20ORDER%20BY%20created%20DESC&maxResults=100&expand=comments&fields=summary,status,created,updated,resolutiondate,description,comment,customfield_13337" \
-  -H "Accept: application/json"
+export JIRA_EMAIL="your.email@nextroll.com"
+export JIRA_API_TOKEN="your-token-here"
+
+# Fetch one month at a time
+./fetch-jira.sh 2025-11-01 2025-11-30
+sleep 1
+./fetch-jira.sh 2025-12-01 2025-12-31
 ```
 
-Format each ticket entry like this:
-
-```
---------------------------------------------------
-
-Ticket: ABC-1234
-Summary: Fix the database connection issue
-Status: Done
-Created: 2025-07-21 09:15:23
-Updated: 2025-07-21 14:30:45
-URL: https://adroll.atlassian.net/browse/ABC-1234
-
-Description:
-[ticket description text]
-
-Comments:
-- 2025-07-21 10:30:12 (jonathan.aquino): Started investigating the connection pool settings
-- 2025-07-21 14:28:03 (jane.doe): Looks good, approved for merge
-```
-
-Use jq to parse the JSON response and extract: key, summary, status, created, updated, description, and all comments with timestamps and authors. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Add `sleep 0.5` between requests to avoid rate limiting.
+The script will:
+- Query Jira API for the date range
+- Parse tickets using jq and extract all fields including UDP's custom description field
+- Group tickets by resolution date
+- Write to `~/Dropbox/ai-context/daily-work/jira/YYYY-MM-DD.txt`
+- Create empty files for dates with no tickets
+- Skip dates whose files already exist
 
 ## Claude Code Conversations
 
