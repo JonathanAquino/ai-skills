@@ -16,7 +16,7 @@ fi
 
 START_DATE="$1"
 END_DATE="$2"
-OUTPUT_DIR="$HOME/Dropbox/ai-context/daily-work/jira"
+OUTPUT_DIR="$HOME/Documents/ai-context/daily-work/jira"
 
 if [ -z "${JIRA_EMAIL:-}" ] || [ -z "${JIRA_API_TOKEN:-}" ]; then
     echo "Error: JIRA_EMAIL and JIRA_API_TOKEN environment variables must be set"

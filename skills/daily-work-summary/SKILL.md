@@ -21,7 +21,7 @@ Ask me for a sample search.modules.messages curl request to get slack search res
 
 Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, print "curl command failed" and stop.
 
-I want you to scrape the search results for each day in the date range and put the results in `~/Dropbox/ai-context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Dropbox/ai-context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
+I want you to scrape the search results for each day in the date range and put the results in `~/Documents/ai-context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Documents/ai-context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
 
 ```
 --------------------------------------------------
@@ -34,7 +34,7 @@ Text: I need reviews on my funnel metrics PRs
 
 ## GitHub
 
-Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Documents/ai-context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
 ## Jira
 
@@ -58,18 +58,18 @@ The script will:
 - Query Jira API for the date range
 - Parse tickets using jq and extract all fields including UDP's custom description field
 - Group tickets by resolution date
-- Write to `~/Dropbox/ai-context/daily-work/jira/YYYY-MM-DD.txt`
+- Write to `~/Documents/ai-context/daily-work/jira/YYYY-MM-DD.txt`
 - Create empty files for dates with no tickets
 - Skip dates whose files already exist
 
 ## Claude Code Conversations
 
-Extract my messages from Claude Code conversation logs for each day in the date range. Put the results in `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`. Skip any dates whose files already exist. If there were no conversations on the day, create an empty file `2025-07-21.txt`.
+Extract my messages from Claude Code conversation logs for each day in the date range. Put the results in `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`. Skip any dates whose files already exist. If there were no conversations on the day, create an empty file `2025-07-21.txt`.
 
 Use this command to extract user messages for a specific date:
 
 ```bash
-find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("2025-07-21")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null > ~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt
+find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("2025-07-21")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null > ~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt
 ```
 
 This extracts only your typed messages, excluding Claude's responses, tool results, and system-generated messages. Each message will appear on its own line in the output file.
@@ -80,10 +80,10 @@ For each day in the date range, I would like a summary of my work on that day. P
 
 Use the following as source material:
 
-* `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/github/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/slack/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/jira/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
 Don't forget the Claude Code conversations and Jira tickets.
@@ -94,10 +94,10 @@ For each day in the date range, I would like a 1-paragraph summary of my work on
 
 Use the following as source material:
 
-* `~/Dropbox/ai-context/daily-work/github/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/slack/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/Dropbox/ai-context/daily-work/claude-code/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/github/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/slack/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/jira/2025-07-21.txt`
+* `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
 Don't forget the Claude Code conversations and Jira tickets.
