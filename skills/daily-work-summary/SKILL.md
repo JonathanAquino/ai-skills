@@ -21,7 +21,7 @@ Ask me for a sample search.modules.messages curl request to get slack search res
 
 Test the curl command. You may need to add `--compressed | jq .` to the end. If it doesn't return the expected results, print "curl command failed" and stop.
 
-I want you to scrape the search results for each day in the date range and put the results in `~/Documents/ai-context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Documents/ai-context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
+I want you to scrape the search results for each day in the date range and put the results in `~/Documents/AI_Context/daily-work/slack/YYYY-MM-DD.txt`. For example, `~/Documents/AI_Context/daily-work/slack/2025-07-02.txt`. Skip any dates whose files already exist. To vary the date, set `before:2025-07-03 after:2025-07-01` - note that before is the day after the desired date and after is the date before the desired date. Read the page_count to get the number of pages, and iterate over all pages by varying the page parameter. Make sure to scrape all pages - don't just get the first page. If a page has no results, try to figure out what is wrong. Print the number of messages on each page as you go. IMPORTANT: Just run the curl commands - don't make a script, as the script will often have bugs. Each entry should look like this:
 
 ```
 --------------------------------------------------
@@ -34,7 +34,7 @@ Text: I need reviews on my funnel metrics PRs
 
 ## GitHub
 
-Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Documents/ai-context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
+Use this command `gh search prs --author=JonathanAquino-NextRoll --created=2025-07-21 --json number,title,body,url,repository,createdAt,state --limit 20` to put the PR descriptions of PRs I created for each day in the date range. For example, `~/Documents/AI_Context/daily-work/github/2025-07-21.txt`. Skip any dates whose files already exist. If there were no PRs on the day, create an empty file `2025-07-21.txt`. If there was an error, do not create any file, and try to figure out what went wrong - try sleeping for 30 seconds if there is a rate limiting error.
 
 ## Jira
 
@@ -58,18 +58,18 @@ The script will:
 - Query Jira API for the date range
 - Parse tickets using jq and extract all fields including UDP's custom description field
 - Group tickets by resolution date
-- Write to `~/Documents/ai-context/daily-work/jira/YYYY-MM-DD.txt`
+- Write to `~/Documents/AI_Context/daily-work/jira/YYYY-MM-DD.txt`
 - Create empty files for dates with no tickets
 - Skip dates whose files already exist
 
 ## Claude Code Conversations
 
-Extract my messages from Claude Code conversation logs for each day in the date range. Put the results in `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`. Skip any dates whose files already exist. If there were no conversations on the day, create an empty file `2025-07-21.txt`.
+Extract my messages from Claude Code conversation logs for each day in the date range. Put the results in `~/Documents/AI_Context/daily-work/claude-code/2025-07-21.txt`. Skip any dates whose files already exist. If there were no conversations on the day, create an empty file `2025-07-21.txt`.
 
 Use this command to extract user messages for a specific date:
 
 ```bash
-find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("2025-07-21")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null > ~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt
+find ~/.claude/projects -name "[0-9a-f]*.jsonl" | xargs cat | jq -r 'select(.timestamp? | contains("2025-07-21")) | select(.type == "user") | select(.message.content | type == "string") | select(.message.content | test("<command-name>|<local-command|Caveat:") | not) | .message.content' 2>/dev/null > ~/Documents/AI_Context/daily-work/claude-code/2025-07-21.txt
 ```
 
 This extracts only your typed messages, excluding Claude's responses, tool results, and system-generated messages. Each message will appear on its own line in the output file.
@@ -80,10 +80,10 @@ For each day in the date range, I would like a summary of my work on that day. P
 
 Use the following as source material:
 
-* `~/Documents/ai-context/daily-work/github/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/slack/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/github/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/slack/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/jira/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
 Don't forget the Claude Code conversations and Jira tickets.
@@ -94,10 +94,10 @@ For each day in the date range, I would like a 1-paragraph summary of my work on
 
 Use the following as source material:
 
-* `~/Documents/ai-context/daily-work/github/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/slack/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/jira/2025-07-21.txt`
-* `~/Documents/ai-context/daily-work/claude-code/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/github/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/slack/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/jira/2025-07-21.txt`
+* `~/Documents/AI_Context/daily-work/claude-code/2025-07-21.txt`
 * `~/Dropbox/Jon's Obsidian Vault/Personal/Daily Log/2025-07-21*`
 
 Don't forget the Claude Code conversations and Jira tickets.
@@ -197,31 +197,52 @@ Remind me to delete the Jira API token from https://id.atlassian.com/manage-prof
 
 ### Summary Generation
 
-1. **File naming convention**:
+1. **IMPORTANT: Use AI to synthesize, don't copy/paste**: Summaries should be AI-generated narratives that synthesize information from all sources, NOT mechanical copy/paste of PR titles or ticket descriptions. The summary should read naturally, explaining what was done and why it matters.
+
+2. **Use the `claude` command for generation**: Feed all source materials to the `claude` CLI command with `--print` flag to generate summaries:
+   ```bash
+   SLACK=$(cat ~/Documents/AI_Context/daily-work/slack/$DATE.txt)
+   GITHUB=$(cat ~/Documents/AI_Context/daily-work/github/$DATE.txt)
+   JIRA=$(cat ~/Documents/AI_Context/daily-work/jira/$DATE.txt)
+   CLAUDE_CODE=$(head -100 ~/Documents/AI_Context/daily-work/claude-code/$DATE.txt | grep -v "^Warmup$" | head -50)
+
+   claude --print << PROMPT
+   Create a daily work summary for $DATE. Write naturally, synthesizing all sources.
+
+   SLACK: $SLACK
+   GITHUB: $GITHUB
+   JIRA: $JIRA
+   CLAUDE CODE: $CLAUDE_CODE
+
+   Format as markdown with ## Main Activities, ## Slack Discussions (if relevant), ## PRs Merged (if any).
+   PROMPT
+   ```
+
+3. **File naming convention**:
    - Days with activity: `2025-10-15-deadlock-oom-fixes.md` (date + 3-4 word description of main activity)
    - Days with no activity: `2025-10-18.md` (just the date, empty file)
 
-2. **Summary structure**: Use this format for Daily Summaries:
+4. **Summary structure**: Use this format for Daily Summaries:
    ```markdown
    # Daily Work Summary: YYYY-MM-DD
 
    ## Main Activities
-   [Describe main work items with PR numbers and JIRA tickets]
+   [Narrative description of work - synthesize, don't just list]
 
    ## Slack Discussions
-   [Key discussions and coordination]
+   [Key discussions and coordination - only if meaningful content]
 
    ## PRs Merged
-   1. repo#number - Title
+   [List with links - only if PRs exist]
    ```
 
-3. **Paragraph summary format**: 1-2 sentences capturing the essence of the day's work, mentioning PR numbers and ticket IDs where relevant.
+5. **Paragraph summary format**: 1-2 sentences capturing the essence of the day's work, mentioning PR numbers and ticket IDs where relevant. Generate from the full summary using `claude --print`.
 
-4. **Empty days**: For weekends or days with no work activity, use `touch` to create empty files so they get skipped on subsequent runs.
+6. **Empty days**: For weekends or days with no work activity, use `touch` to create empty files so they get skipped on subsequent runs.
 
-5. **Batch processing**: Check multiple days at once (5-10 days) to speed up processing, then create summaries for each.
+7. **Batch processing**: Process multiple days in sequence, using a loop to call `claude --print` for each day.
 
-6. **Slack-only days**: If there are Slack discussions but no PRs, still create a summary focusing on the discussions, coordination, and any investigations mentioned.
+8. **Slack-only days**: If there are Slack discussions but no PRs, still create a summary focusing on the discussions, coordination, and any investigations mentioned.
 
 ### General Shell Scripting
 
